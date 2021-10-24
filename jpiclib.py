@@ -9,12 +9,12 @@ import pickle
 import huffman
 
 
-def quantization_uniform(m):
+def quantization_lossless(m):
     # just convert matrix to int
     return np.around(m).astype('int')
 
 
-def quantization_uniform_rev(m):
+def quantization_lossless_rev(m):
     # just convert matrix to float
     return np.around(m).astype('float')
 

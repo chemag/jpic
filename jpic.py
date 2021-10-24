@@ -46,10 +46,10 @@ def encode_file(frame_data, width, height):
     description += 'transform: dct\n'
 
     # 2. quantization
-    y_dct_q = jpiclib.quantization_uniform(y_dct)
-    u_dct_q = jpiclib.quantization_uniform(u_dct)
-    v_dct_q = jpiclib.quantization_uniform(v_dct)
-    description += 'quantization: uniform\n'
+    y_dct_q = jpiclib.quantization_lossless(y_dct)
+    u_dct_q = jpiclib.quantization_lossless(u_dct)
+    v_dct_q = jpiclib.quantization_lossless(v_dct)
+    description += 'quantization: lossless\n'
 
     # 3. zig-zag scan
     y_dct_q_z = jpiclib.zigzag_scan(y_dct_q)
@@ -229,9 +229,9 @@ def decode_file(bstring):
     v_dct_q = jpiclib.zigzag_unscan(v_dct_q_z, width_c, height_c)
 
     # 4. reverse quantization
-    y_dct = jpiclib.quantization_uniform_rev(y_dct_q)
-    u_dct = jpiclib.quantization_uniform_rev(u_dct_q)
-    v_dct = jpiclib.quantization_uniform_rev(v_dct_q)
+    y_dct = jpiclib.quantization_lossless_rev(y_dct_q)
+    u_dct = jpiclib.quantization_lossless_rev(u_dct_q)
+    v_dct = jpiclib.quantization_lossless_rev(v_dct_q)
 
     # 5. IDCT transform
     # process luma
