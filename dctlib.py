@@ -175,14 +175,14 @@ def parse_420_buffer(frame_data, width, height):
 
 
 def dump_420_buffer(y, u, v):
-    buffer = b''
+    buf = b''
     # dump luma and chromas
-    buffer += y.tostring()
-    if u:
-        buffer += u.tostring()
-    if v:
-        buffer += v.tostring()
-    return buffer
+    buf += y.tostring()
+    if u is not None:
+        buf += u.tostring()
+    if v is not None:
+        buf += v.tostring()
+    return buf
 
 
 def process_file(options):
