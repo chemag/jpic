@@ -106,7 +106,7 @@ def get_frame_idct(inp):
             outblock = get_block_idct(block)
             idct[i:i+8, j:j+8] = outblock
     # return integer matrix
-    return idct.round().astype('int')
+    return idct.round().astype('uint8')
 
 
 # returns an 8x8 matrix with the mean of all the values in a DCT matrix
