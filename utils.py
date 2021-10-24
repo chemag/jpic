@@ -19,6 +19,12 @@ def write_as_bin(bstring, outfile):
         fout.write(bstring)
 
 
+def write_as_raw(buf, outfile):
+    # write buffer into the outfile
+    with open(outfile, 'wb') as fout:
+        fout.write(buf)
+
+
 def write_as_pgm(array, outfile):
     # write frame into the outfile (as pgm format)
     with open(outfile, 'w') as fout:

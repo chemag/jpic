@@ -22,14 +22,17 @@ default_values = {
     'width': 720,
     'height': 480,
     'framenum': 0,
+    'dump_input': None,
+    'dump_pgm': None,
     'function': 'encode',
     'infile': None,
     'outfile': None,
 }
 
 
-def encode_file(infile, framenum, width, height):
-    y, u, v = dctlib.read_frame(infile, framenum, width, height)
+def encode_file(frame_data, width, height):
+    # convert into numpy arrays
+    y, u, v = dctlib.parse_420_buffer(frame_data, width, height)
 
     description = ''
     description += 'color: luma\n'
@@ -266,12 +269,22 @@ def get_options(argv):
             dest='function', const='parse',
             help='Parse file',)
     parser.add_argument(
+            '--dump-input', type=str,
+            default=default_values['dump_input'],
+            metavar='dump_input',
+            help='dump_input',)
+    parser.add_argument(
+            '--dump-pgm', type=str,
+            default=default_values['dump_pgm'],
+            metavar='dump_pgm',
+            help='dump_pgm',)
+    parser.add_argument(
             'infile', type=str,
             default=default_values['infile'],
             metavar='input-file',
             help='input file',)
     parser.add_argument(
-            'outfile', type=str,
+            'outfile', type=str, nargs='?',
             default=default_values['outfile'],
             metavar='output-file',
             help='output file',)
@@ -292,14 +305,20 @@ def main(argv):
     if options.debug > 0:
         print(options)
     if options.function == 'encode':
-        out = encode_file(options.infile, options.framenum, options.width,
-                          options.height)
+        frame_data = dctlib.read_frame(options.infile, options.width,
+                                       options.height, options.framenum)
+        if options.dump_input:
+            utils.write_as_raw(frame_data, options.dump_input)
+        out = encode_file(frame_data, options.width, options.height)
         utils.write_as_bin(out, options.outfile)
 
     elif options.function == 'decode':
         bstring = utils.read_as_bin(options.infile)
         y, u, v = decode_file(bstring)
-        utils.write_as_pgm(y, options.outfile)
+        if options.dump_pgm:
+            utils.write_as_pgm(y, options.dump_pgm)
+        out = dctlib.dump_420_buffer(y, u, v)
+        utils.write_as_raw(out, options.outfile)
 
     elif options.function == 'parse':
         bstring = utils.read_as_bin(options.infile)

@@ -144,17 +144,20 @@ def process_frame(y, u, v):
     return dct_y
 
 
-def read_frame(infile, framenum, width, height):
+def read_frame(infile, width, height, framenum=0):
     # assume 4:2:0 subsampling
+    frame_size = int(width * height * 1.5)
+    # read raw data from infile
+    frame_data = utils.read_as_bin(infile, frame_size, framenum * frame_size)
+    return frame_data
+
+
+def parse_420_buffer(frame_data, width, height):
+    # calculate 4:2:0 parameters
     width_y = width
     height_y = height
     width_c = width_y >> 1
     height_c = height_y >> 1
-    frame_size = int(width_y * height_y * 1.5)
-
-    # read raw data from infile
-    frame_data = utils.read_as_bin(infile, frame_size, framenum * frame_size)
-
     # read luma and chromas
     y = np.frombuffer(frame_data[:(width_y * height_y)], dtype=np.uint8)
     y.shape = (width_y, height_y)
@@ -171,9 +174,20 @@ def read_frame(infile, framenum, width, height):
     return y, u, v
 
 
+def dump_420_buffer(y, u, v):
+    buffer = b''
+    # dump luma and chromas
+    buffer += y.tostring()
+    if u:
+        buffer += u.tostring()
+    if v:
+        buffer += v.tostring()
+    return buffer
+
+
 def process_file(options):
-    y, u, v = read_frame(options.infile, options.framenum, options.width,
-                         options.height)
+    y, u, v = read_frame(options.infile, options.width, options.height,
+                         options.framenum)
 
     # process luma
     dct_y = get_frame_dct(y)
