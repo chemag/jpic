@@ -35,27 +35,27 @@ def encode_file(frame_data, width, height):
     y, u, v = dctlib.parse_420_buffer(frame_data, width, height)
 
     description = ''
-    description += 'color: luma\n'
+    description += 'color: yuv\n'
     description += 'width: %i\n' % width
     description += 'height: %i\n' % height
 
     # 1. DCT transform
     # process luma
-    dct_y = dctlib.get_frame_dct(y)
+    y_dct = dctlib.get_frame_dct(y)
     description += 'transform: dct\n'
 
     # 2. quantization
-    dct_yq = jpiclib.quantization_uniform(dct_y)
+    y_dct_q = jpiclib.quantization_uniform(y_dct)
     description += 'quantization: uniform\n'
 
     # 3. zig-zag scan
-    dct_yqz = jpiclib.zigzag_scan(dct_yq)
+    y_dct_q_z = jpiclib.zigzag_scan(y_dct_q)
     description += 'zigzag: basic\n'
 
     # 4. huffman coding and RLE
-    # jpiclib.dc00_as_delta(dct_yqz)
-    encoding_table = jpiclib.get_encoding_table(dct_yqz)
-    luma = jpiclib.encode(dct_yqz, encoding_table)
+    # jpiclib.dc00_as_delta(y_dct_q_z)
+    y_enc_table = jpiclib.get_encoding_table(y_dct_q_z)
+    y_enc_bits = jpiclib.encode(y_dct_q_z, y_enc_table)
     description += 'encoding: basic\n'
 
     # 5. put everything together using a TLV approach (L in bits)
@@ -69,17 +69,17 @@ def encode_file(frame_data, width, height):
     out += str.encode(description)
     # 5.3. encoding table
     # serialize encoding table
-    encoding_table_bin = jpiclib.serialize_encoding_table(encoding_table)
-    out += b'tabl'
-    encoding_table_bitlen = len(encoding_table_bin) * 8
-    out += struct.pack('=l', encoding_table_bitlen)
-    out += encoding_table_bin
+    y_enc_table_bin = jpiclib.serialize_encoding_table(y_enc_table)
+    out += b'ytbl'
+    y_enc_table_bitlen = len(y_enc_table_bin) * 8
+    out += struct.pack('=l', y_enc_table_bitlen)
+    out += y_enc_table_bin
     # 5.4. encoding luma
-    out += b'luma'
+    out += b'plny'
     # BitArray's return their length in bits
-    luma_bitlen = len(luma)
-    out += struct.pack('=l', luma_bitlen)
-    out += luma.tobytes()
+    y_enc_bitlen = len(y_enc_bits)
+    out += struct.pack('=l', y_enc_bitlen)
+    out += y_enc_bits.tobytes()
     return out
 
 
@@ -102,25 +102,25 @@ def decode_file(bstring):
     # 1.3. encoding table
     tag = bstring[i:i + 4]
     i += 4
-    assert tag == b'tabl', 'invalid jpic file: no tabl'
-    encoding_table_bitlen = struct.unpack('=l', bstring[i:i + 4])[0]
+    assert tag == b'ytbl', 'invalid jpic file: no ytbl'
+    y_enc_table_bitlen = struct.unpack('=l', bstring[i:i + 4])[0]
     i += 4
-    encoding_table_len = encoding_table_bitlen >> 3
-    encoding_table_bin = bstring[i:i + encoding_table_len]
-    i += encoding_table_len
-    encoding_table = jpiclib.unserialize_encoding_table(encoding_table_bin)
+    y_enc_table_len = y_enc_table_bitlen >> 3
+    y_enc_table_bin = bstring[i:i + y_enc_table_len]
+    i += y_enc_table_len
+    y_enc_table = jpiclib.unserialize_encoding_table(y_enc_table_bin)
     # 1.4. encoding bits
     tag = bstring[i:i + 4]
     i += 4
-    assert tag == b'luma', 'invalid jpic file: no luma'
-    luma_bitlen = struct.unpack('=l', bstring[i:i + 4])[0]
+    assert tag == b'plny', 'invalid jpic file: no plny'
+    y_enc_bitlen = struct.unpack('=l', bstring[i:i + 4])[0]
     i += 4
-    luma_len = int(math.ceil(luma_bitlen / 8))
-    luma_bytes = bstring[i:i + luma_len]
-    i += luma_len
-    luma = bitstring.BitArray(luma_bytes)
+    y_enc_len = int(math.ceil(y_enc_bitlen / 8))
+    y_enc_binary = bstring[i:i + y_enc_len]
+    i += y_enc_len
+    y_enc_bits = bitstring.BitArray(y_enc_binary)
     # adjust the length of luma to the bit
-    del luma[luma_bitlen:]
+    del y_enc_bits[y_enc_bitlen:]
     # 1.5. parse description
     description = description_bits.decode('ascii')
     info = {}
@@ -133,18 +133,18 @@ def decode_file(bstring):
     height = int(info['height'])
 
     # 2. huffman coding and RLE
-    # jpiclib.dc00_as_delta(dct_yqz)
-    dct_yqz = jpiclib.decode(luma, width, height, encoding_table)
+    # jpiclib.dc00_as_delta(y_dct_q_z)
+    y_dct_q_z = jpiclib.decode(y_enc_bits, width, height, y_enc_table)
 
     # 3. un-zig-zag scan
-    dct_yq = jpiclib.zigzag_unscan(dct_yqz, width, height)
+    y_dct_q = jpiclib.zigzag_unscan(y_dct_q_z, width, height)
 
     # 4. reverse quantization
-    dct_y = jpiclib.quantization_uniform_rev(dct_yq)
+    y_dct = jpiclib.quantization_uniform_rev(y_dct_q)
 
     # 5. IDCT transform
     # process luma
-    y = dctlib.get_frame_idct(dct_y)
+    y = dctlib.get_frame_idct(y_dct)
 
     return y, None, None
 
@@ -173,22 +173,22 @@ def parse_file(bstring):
     # 1.3. encoding table
     tag = bstring[i:i + 4]
     i += 4
-    assert tag == b'tabl', 'invalid jpic file: no tabl'
-    encoding_table_bitlen = struct.unpack('=l', bstring[i:i + 4])[0]
+    assert tag == b'ytbl', 'invalid jpic file: no ytbl'
+    y_enc_table_bitlen = struct.unpack('=l', bstring[i:i + 4])[0]
     i += 4
-    encoding_table_len = encoding_table_bitlen >> 3
-    i += encoding_table_len
-    size.append(['tabl', 4 + 4 + encoding_table_len])
+    y_enc_table_len = y_enc_table_bitlen >> 3
+    i += y_enc_table_len
+    size.append(['ytbl', 4 + 4 + y_enc_table_len])
 
     # 1.4. encoding bits
     tag = bstring[i:i + 4]
     i += 4
-    assert tag == b'luma', 'invalid jpic file: no luma'
-    luma_bitlen = struct.unpack('=l', bstring[i:i + 4])[0]
+    assert tag == b'plny', 'invalid jpic file: no plny'
+    y_enc_bitlen = struct.unpack('=l', bstring[i:i + 4])[0]
     i += 4
-    luma_len = int(math.ceil(luma_bitlen / 8))
-    i += luma_len
-    size.append(['luma', 4 + 4 + luma_len])
+    y_enc_len = int(math.ceil(y_enc_bitlen / 8))
+    i += y_enc_len
+    size.append(['plny', 4 + 4 + y_enc_len])
 
     # 1.5. parse description
     description = description_bits.decode('ascii')
