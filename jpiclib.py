@@ -9,6 +9,18 @@ import pickle
 import huffman
 
 
+def quantization(m, qtype):
+    if qtype == 'lossless':
+        return quantization_lossless(m)
+    assert False, 'invalid quantization type: %s' % qtype
+
+
+def quantization_rev(m, qtype):
+    if qtype == 'lossless':
+        return quantization_lossless_rev(m)
+    assert False, 'invalid quantization type: %s' % qtype
+
+
 def quantization_lossless(m):
     # just convert matrix to int
     return np.around(m).astype('int')

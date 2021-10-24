@@ -15,6 +15,7 @@ import utils
 
 
 FUNCTION_CHOICES = ['encode', 'decode', 'parse']
+QUANTIZATION_CHOICES = ['lossless',]
 
 
 default_values = {
@@ -24,13 +25,14 @@ default_values = {
     'framenum': 0,
     'dump_input': None,
     'dump_pgm': None,
+    'quantization': 'lossless',
     'function': 'encode',
     'infile': None,
     'outfile': None,
 }
 
 
-def encode_file(frame_data, width, height):
+def encode_file(frame_data, width, height, quantization):
     # convert into numpy arrays
     y, u, v = dctlib.parse_420_buffer(frame_data, width, height)
 
@@ -46,10 +48,10 @@ def encode_file(frame_data, width, height):
     description += 'transform: dct\n'
 
     # 2. quantization
-    y_dct_q = jpiclib.quantization_lossless(y_dct)
-    u_dct_q = jpiclib.quantization_lossless(u_dct)
-    v_dct_q = jpiclib.quantization_lossless(v_dct)
-    description += 'quantization: lossless\n'
+    y_dct_q = jpiclib.quantization(y_dct, quantization)
+    u_dct_q = jpiclib.quantization(u_dct, quantization)
+    v_dct_q = jpiclib.quantization(v_dct, quantization)
+    description += 'quantization: %s\n' % quantization
 
     # 3. zig-zag scan
     y_dct_q_z = jpiclib.zigzag_scan(y_dct_q)
@@ -216,6 +218,7 @@ def decode_file(bstring):
     height = int(info['height'])
     width_c = width >> 1
     height_c = height >> 1
+    quantization = info['quantization']
 
     # 2. huffman coding and RLE
     # jpiclib.dc00_as_delta(y_dct_q_z)
@@ -229,9 +232,9 @@ def decode_file(bstring):
     v_dct_q = jpiclib.zigzag_unscan(v_dct_q_z, width_c, height_c)
 
     # 4. reverse quantization
-    y_dct = jpiclib.quantization_lossless_rev(y_dct_q)
-    u_dct = jpiclib.quantization_lossless_rev(u_dct_q)
-    v_dct = jpiclib.quantization_lossless_rev(v_dct_q)
+    y_dct = jpiclib.quantization_rev(y_dct_q, quantization)
+    u_dct = jpiclib.quantization_rev(u_dct_q, quantization)
+    v_dct = jpiclib.quantization_rev(v_dct_q, quantization)
 
     # 5. IDCT transform
     # process luma
@@ -382,6 +385,13 @@ def get_options(argv):
             help=('FRAMENUM (default: %i)' % default_values['framenum']),)
 
     parser.add_argument(
+            '-Q', '--quantization', action='store',
+            dest='quantization', type=str,
+            default=default_values['quantization'],
+            choices=QUANTIZATION_CHOICES,
+            metavar='quantization',
+            help='quantization',)
+    parser.add_argument(
             'function', type=str,
             default=default_values['function'],
             choices=FUNCTION_CHOICES,
@@ -440,7 +450,8 @@ def main(argv):
                                        options.height, options.framenum)
         if options.dump_input:
             utils.write_as_raw(frame_data, options.dump_input)
-        out = encode_file(frame_data, options.width, options.height)
+        out = encode_file(frame_data, options.width, options.height,
+                          options.quantization)
         utils.write_as_bin(out, options.outfile)
 
     elif options.function == 'decode':
