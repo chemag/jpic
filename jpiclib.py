@@ -12,9 +12,10 @@ import huffman
 def quantization(m, qtype, **kwargs):
     if qtype == 'lossless':
         return quantization_lossless(m)
-    elif qtype == 'jpeg':
+    elif qtype.split('-')[0] == 'jpeg':
         is_luma = kwargs.get('luma')
-        return quantization_jpeg(m, is_luma)
+        val = int(qtype.split('-')[1])
+        return quantization_jpeg(m, is_luma, val)
     elif qtype.split('-')[0] == 'uniform':
         val = int(qtype.split('-')[1])
         return quantization_uniform(m, val)
@@ -24,9 +25,10 @@ def quantization(m, qtype, **kwargs):
 def quantization_rev(m, qtype, **kwargs):
     if qtype == 'lossless':
         return quantization_lossless_rev(m)
-    elif qtype == 'jpeg':
+    elif qtype.split('-')[0] == 'jpeg':
         is_luma = kwargs.get('luma')
-        return quantization_jpeg_rev(m, is_luma)
+        val = int(qtype.split('-')[1])
+        return quantization_jpeg_rev(m, is_luma, val)
     elif qtype.split('-')[0] == 'uniform':
         val = int(qtype.split('-')[1])
         return quantization_uniform_rev(m, val)
@@ -68,13 +70,15 @@ QUANT_JPEG_C = np.array([
 ])
 
 
-def quantization_jpeg(m, is_luma):
-    qm = QUANT_JPEG_Y if is_luma else QUANT_JPEG_C
+def quantization_jpeg(m, is_luma, val):
+    qm = np.copy(QUANT_JPEG_Y if is_luma else QUANT_JPEG_C)
+    qm //= val
     return quantization_matrix(m, qm)
 
 
-def quantization_jpeg_rev(m, is_luma):
-    qm = QUANT_JPEG_Y if is_luma else QUANT_JPEG_C
+def quantization_jpeg_rev(m, is_luma, val):
+    qm = np.copy(QUANT_JPEG_Y if is_luma else QUANT_JPEG_C)
+    qm //= val
     return quantization_matrix_rev(m, qm)
 
 
@@ -91,12 +95,12 @@ QUANT_UNIFORM = np.array([
 
 
 def quantization_uniform(m, val):
-    qm = QUANT_UNIFORM * val
+    qm = np.copy(QUANT_UNIFORM * val)
     return quantization_matrix(m, qm)
 
 
 def quantization_uniform_rev(m, val):
-    qm = QUANT_UNIFORM * val
+    qm = np.copy(QUANT_UNIFORM * val)
     return quantization_matrix_rev(m, qm)
 
 
