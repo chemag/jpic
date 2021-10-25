@@ -15,7 +15,7 @@ import utils
 
 
 FUNCTION_CHOICES = ['encode', 'decode', 'parse']
-QUANTIZATION_CHOICES = ['lossless',]
+QUANTIZATION_CHOICES = ['lossless', 'jpeg', 'uniform-2', 'uniform-10', 'uniform-20']
 
 
 default_values = {
@@ -48,9 +48,9 @@ def encode_file(frame_data, width, height, quantization):
     description += 'transform: dct\n'
 
     # 2. quantization
-    y_dct_q = jpiclib.quantization(y_dct, quantization)
-    u_dct_q = jpiclib.quantization(u_dct, quantization)
-    v_dct_q = jpiclib.quantization(v_dct, quantization)
+    y_dct_q = jpiclib.quantization(y_dct, quantization, luma=True)
+    u_dct_q = jpiclib.quantization(u_dct, quantization, luma=False)
+    v_dct_q = jpiclib.quantization(v_dct, quantization, luma=False)
     description += 'quantization: %s\n' % quantization
 
     # 3. zig-zag scan

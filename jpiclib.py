@@ -9,15 +9,27 @@ import pickle
 import huffman
 
 
-def quantization(m, qtype):
+def quantization(m, qtype, **kwargs):
     if qtype == 'lossless':
         return quantization_lossless(m)
+    elif qtype == 'jpeg':
+        is_luma = kwargs.get('luma')
+        return quantization_jpeg(m, is_luma)
+    elif qtype.split('-')[0] == 'uniform':
+        val = int(qtype.split('-')[1])
+        return quantization_uniform(m, val)
     assert False, 'invalid quantization type: %s' % qtype
 
 
-def quantization_rev(m, qtype):
+def quantization_rev(m, qtype, **kwargs):
     if qtype == 'lossless':
         return quantization_lossless_rev(m)
+    elif qtype == 'jpeg':
+        is_luma = kwargs.get('luma')
+        return quantization_jpeg_rev(m, is_luma)
+    elif qtype.split('-')[0] == 'uniform':
+        val = int(qtype.split('-')[1])
+        return quantization_uniform_rev(m, val)
     assert False, 'invalid quantization type: %s' % qtype
 
 
@@ -29,6 +41,81 @@ def quantization_lossless(m):
 def quantization_lossless_rev(m):
     # just convert matrix to float
     return np.around(m).astype('float')
+
+
+# https://www.sciencedirect.com/topics/engineering/quantization-table
+QUANT_JPEG_Y = np.array([
+    [16, 11, 10, 16,  24,  40,  51,  61],  # noqa: E201
+    [12, 12, 14, 19,  26,  58,  60,  55],  # noqa: E201
+    [14, 13, 16, 24,  40,  57,  69,  56],  # noqa: E201
+    [14, 17, 22, 29,  51,  87,  80,  62],  # noqa: E201
+    [18, 22, 37, 56,  68, 109, 103,  77],  # noqa: E201
+    [24, 35, 55, 64,  81, 104, 113,  92],  # noqa: E201
+    [49, 64, 78, 87, 103, 121, 120, 101],  # noqa: E201
+    [72, 92, 95, 98, 112, 100, 103,  99],  # noqa: E201
+])
+
+
+QUANT_JPEG_C = np.array([
+    [17, 18, 24, 47, 99, 99, 99, 99],
+    [18, 21, 26, 66, 99, 99, 99, 99],
+    [24, 26, 56, 99, 99, 99, 99, 99],
+    [47, 66, 99, 99, 99, 99, 99, 99],
+    [99, 99, 99, 99, 99, 99, 99, 99],
+    [99, 99, 99, 99, 99, 99, 99, 99],
+    [99, 99, 99, 99, 99, 99, 99, 99],
+    [99, 99, 99, 99, 99, 99, 99, 99],
+])
+
+
+def quantization_jpeg(m, is_luma):
+    qm = QUANT_JPEG_Y if is_luma else QUANT_JPEG_C
+    return quantization_matrix(m, qm)
+
+
+def quantization_jpeg_rev(m, is_luma):
+    qm = QUANT_JPEG_Y if is_luma else QUANT_JPEG_C
+    return quantization_matrix_rev(m, qm)
+
+
+QUANT_UNIFORM = np.array([
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1],
+])
+
+
+def quantization_uniform(m, val):
+    qm = QUANT_UNIFORM * val
+    return quantization_matrix(m, qm)
+
+
+def quantization_uniform_rev(m, val):
+    qm = QUANT_UNIFORM * val
+    return quantization_matrix_rev(m, qm)
+
+
+def quantization_matrix(m, qm):
+    width, height = m.shape
+    for i in range(0, width, 8):
+        for j in range(0, height, 8):
+            # get block using numpy subset view
+            m[i:i+8, j:j+8] /= qm
+    return np.around(m).astype('int')
+
+
+def quantization_matrix_rev(m, qm):
+    width, height = m.shape
+    for i in range(0, width, 8):
+        for j in range(0, height, 8):
+            # get block using numpy subset view
+            m[i:i+8, j:j+8] *= qm
+    return np.around(m).astype('int')
 
 
 ZIGZAG_ORDER = np.array([
