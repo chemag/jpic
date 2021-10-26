@@ -74,7 +74,7 @@ decode.png: libjpeg.csv uniform.csv
         -i lossless.csv --label "jpic-lossless" --fmt 'r.-' \
         decode.png
 
-SRC_FILENAME=~/tmp/vqeg/src14_ref__720x480_420.yuv
+SRC_FILENAME=img/src14_frame0.raw
 SRC_FRAMENUM=0
 
 # raw

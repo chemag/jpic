@@ -392,13 +392,13 @@ def get_options(argv):
             default=default_values['quantization'],
             choices=QUANTIZATION_CHOICES,
             metavar='quantization',
-            help='quantization',)
+            help='quantization (%r)' % QUANTIZATION_CHOICES,)
     parser.add_argument(
             'function', type=str,
             default=default_values['function'],
             choices=FUNCTION_CHOICES,
             metavar='function',
-            help='function',)
+            help='function (%r)' % FUNCTION_CHOICES,)
     parser.add_argument(
             '-E', '--encode', action='store_const',
             dest='function', const='encode',

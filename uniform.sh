@@ -1,13 +1,13 @@
 #!/bin/bash
 
-SRC_FILENAME=~/tmp/vqeg/src14_ref__720x480_420.yuv
+SRC_FILENAME=img/src14_frame0.raw
 SRC_FRAMENUM=0
 
 echo "#qp,encode,decode,size,psnr,ssim"
 for i in $(seq 1 31); do
 	echo -n "$i,"
 	# encode raw file using jpic
-	echo -n "$(/usr/bin/time -f '%e' ./jpic.py encode -Q uniform-${i} --dump-input img/src14_frame0.raw --frame ${SRC_FRAMENUM} ${SRC_FILENAME} img/src14_frame0.uniform-${i}.jpic 2>&1 | tail -1),"
+	echo -n "$(/usr/bin/time -f '%e' ./jpic.py encode -Q uniform-${i} --frame ${SRC_FRAMENUM} ${SRC_FILENAME} img/src14_frame0.uniform-${i}.jpic 2>&1 | tail -1),"
 	echo -n "$(/usr/bin/time -f '%e' ./jpic.py decode --dump-pgm img/src14_frame0.uniform-${i}.jpic.pgm img/src14_frame0.uniform-${i}.jpic img/src14_frame0.uniform-${i}.jpic.raw 2>&1 | tail -1),"
 	# produce a png copy
 	ffmpeg -y -f rawvideo -pixel_format yuv420p -s 720x480 -i img/src14_frame0.uniform-${i}.jpic.raw img/src14_frame0.uniform-${i}.jpic.raw.png &>> /dev/null
