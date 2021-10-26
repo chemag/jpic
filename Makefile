@@ -32,7 +32,7 @@ psnr.png: libjpeg.csv uniform.csv
         -i libjpeg.csv --label "jpeg" --fmt 'y.-' \
         -i uniform.csv --label "jpic-uniform" --fmt 'g.-' \
         -i jpicjpeg.csv --label "jpic-jpeg" --fmt 'b.-' \
-        -i lossless.csv --label "jpic-lossless" --fmt 'r.-' \
+        -i lossless.csv --label "jpic-lossless" --fmt 'r-' \
         psnr.png
 
 ssim.png: libjpeg.csv uniform.csv
@@ -41,8 +41,8 @@ ssim.png: libjpeg.csv uniform.csv
         -i libjpeg.csv --label "jpeg" --fmt 'y.-' \
         -i uniform.csv --label "jpic-uniform" --fmt 'g.-' \
         -i jpicjpeg.csv --label "jpic-jpeg" --fmt 'b.-' \
-        -i lossless.csv --label "jpic-lossless" --fmt 'r.-' \
-        -i raw.csv --label "raw" --fmt 'k.-' \
+        -i lossless.csv --label "jpic-lossless" --fmt 'r-' \
+        -i raw.csv --label "raw" --fmt 'k-' \
         ssim.png
 
 
@@ -52,8 +52,8 @@ size.png: libjpeg.csv uniform.csv
         -i libjpeg.csv --label "jpeg" --fmt 'y.-' \
         -i uniform.csv --label "jpic-uniform" --fmt 'g.-' \
         -i jpicjpeg.csv --label "jpic-jpeg" --fmt 'b.-' \
-        -i lossless.csv --label "jpic-lossless" --fmt 'r.-' \
-        -i raw.csv --label "raw" --fmt 'k.-' \
+        -i lossless.csv --label "jpic-lossless" --fmt 'r-' \
+        -i raw.csv --label "raw" --fmt 'k-' \
         size.png
 
 
@@ -63,7 +63,7 @@ encode.png: libjpeg.csv uniform.csv
         -i libjpeg.csv --label "jpeg" --fmt 'y.-' \
         -i uniform.csv --label "jpic-uniform" --fmt 'g.-' \
         -i jpicjpeg.csv --label "jpic-jpeg" --fmt 'b.-' \
-        -i lossless.csv --label "jpic-lossless" --fmt 'r.-' \
+        -i lossless.csv --label "jpic-lossless" --fmt 'r-' \
         encode.png
 
 decode.png: libjpeg.csv uniform.csv
@@ -72,7 +72,7 @@ decode.png: libjpeg.csv uniform.csv
         -i libjpeg.csv --label "jpeg" --fmt 'y.-' \
         -i uniform.csv --label "jpic-uniform" --fmt 'g.-' \
         -i jpicjpeg.csv --label "jpic-jpeg" --fmt 'b.-' \
-        -i lossless.csv --label "jpic-lossless" --fmt 'r.-' \
+        -i lossless.csv --label "jpic-lossless" --fmt 'r-' \
         decode.png
 
 # raw
