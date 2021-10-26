@@ -15,9 +15,9 @@ import utils
 
 
 FUNCTION_CHOICES = ['encode', 'decode', 'parse']
-QUANTIZATION_CHOICES = (['lossless',] +
-                        ['jpeg-%i' %i for i in range(32)] +
-                        ['uniform-%i' %i for i in range(32)])
+QUANTIZATION_CHOICES = (['lossless', ] +
+                        ['jpeg-%i' % i for i in range(32)] +
+                        ['uniform-%i' % i for i in range(32)])
 
 
 default_values = {

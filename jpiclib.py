@@ -19,7 +19,7 @@ def quantization(m, qtype, **kwargs):
     elif qtype.split('-')[0] == 'uniform':
         val = int(qtype.split('-')[1])
         return quantization_uniform(m, val)
-    assert False, 'invalid quantization type: %s' % qtype
+    raise AssertionError('invalid quantization type: %s' % qtype)
 
 
 def quantization_rev(m, qtype, **kwargs):
@@ -32,7 +32,7 @@ def quantization_rev(m, qtype, **kwargs):
     elif qtype.split('-')[0] == 'uniform':
         val = int(qtype.split('-')[1])
         return quantization_uniform_rev(m, val)
-    assert False, 'invalid quantization type: %s' % qtype
+    raise AssertionError('invalid quantization type: %s' % qtype)
 
 
 def quantization_lossless(m):
