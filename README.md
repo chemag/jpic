@@ -265,6 +265,6 @@ i v -|------------------> j       ...                           | | height
      +--------------------------- ... --------------------------+ v
 ```
 
-Figure XXX shows an example of accessing element [i, j] in a numpy matrix,
+Figure A2.1 shows an example of accessing element [i, j] in a numpy matrix,
 where `i` is the height and `j` is the width.
 
