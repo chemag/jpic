@@ -72,13 +72,17 @@ QUANT_JPEG_C = np.array([
 
 def quantization_jpeg(m, is_luma, val):
     qm = np.copy(QUANT_JPEG_Y if is_luma else QUANT_JPEG_C)
-    qm //= val
+    qm = qm / val
+    # make sure we do not use values smaller than 1
+    qm[qm < 1.0] = 1.0
     return quantization_matrix(m, qm)
 
 
 def quantization_jpeg_rev(m, is_luma, val):
     qm = np.copy(QUANT_JPEG_Y if is_luma else QUANT_JPEG_C)
-    qm //= val
+    qm = qm / val
+    # make sure we do not use values smaller than 1
+    qm[qm < 1.0] = 1.0
     return quantization_matrix_rev(m, qm)
 
 
@@ -109,7 +113,7 @@ def quantization_matrix(m, qm):
     for i in range(0, width, 8):
         for j in range(0, height, 8):
             # get block using numpy subset view
-            m[i:i+8, j:j+8] /= qm
+            m[i:i+8, j:j+8] = m[i:i+8, j:j+8] / qm
     return np.around(m).astype('int')
 
 
@@ -118,7 +122,7 @@ def quantization_matrix_rev(m, qm):
     for i in range(0, width, 8):
         for j in range(0, height, 8):
             # get block using numpy subset view
-            m[i:i+8, j:j+8] *= qm
+            m[i:i+8, j:j+8] = m[i:i+8, j:j+8] * qm
     return np.around(m).astype('int')
 
 
