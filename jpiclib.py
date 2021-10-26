@@ -139,7 +139,7 @@ ZIGZAG_ORDER = np.array([
 
 
 def zigzag_block(block, order=ZIGZAG_ORDER):
-    zigzag = np.zeros(64, dtype=np.int16)
+    zigzag = np.zeros(64, dtype=np.int)
     # map 8x8 vector to 1x64 vector
     for i in range(8):
         for j in range(8):
@@ -155,7 +155,7 @@ def zigzag_scan(inp):
     height, width = inp.shape
     assert width % 8 == 0, 'width must be a multiple of 8 (%i)' % width
     assert height % 8 == 0, 'height must be a multiple of 8 (%i)' % height
-    zigzag = np.zeros((int((width * height) / 64), 64), dtype=np.int16)
+    zigzag = np.zeros((int((width * height) / 64), 64), dtype=np.int)
     bid = 0
     for i in range(0, height, 8):
         for j in range(0, width, 8):
@@ -167,7 +167,7 @@ def zigzag_scan(inp):
 
 
 def zigzag_unblock(zigzag, order=ZIGZAG_ORDER):
-    block = np.zeros((8, 8), dtype=np.int16)
+    block = np.zeros((8, 8), dtype=np.int)
     # map 1x64 vector to 8x8 vector
     for i in range(8):
         for j in range(8):
@@ -186,7 +186,7 @@ def zigzag_unscan(inp, width, height):
     assert height % 8 == 0, 'height must be a multiple of 8 (%i)' % height
     assert numblocks * sixtyfour == width * height
 
-    unzigzag = np.zeros((height, width), dtype=np.int16)
+    unzigzag = np.zeros((height, width), dtype=np.int)
     bid = 0
     for i in range(0, height, 8):
         for j in range(0, width, 8):
@@ -254,7 +254,7 @@ def encode(inp, encoding_table):
     numblocks, _ = inp.shape
     zerocnt = 0
     for i in range(0, numblocks):
-        # let's encode the DC component using uint16
+        # let's encode the DC component using int16
         bits.append('int:16=%s' % inp[i][0])
         # let's encode the AC components using RLE
         for j in range(1, 64):
@@ -274,7 +274,7 @@ def encode(inp, encoding_table):
 
 
 def decode(inp, width, height, encoding_table):
-    zigzag = np.zeros((int((width * height) / 64), 64), dtype=np.int16)
+    zigzag = np.zeros((int((width * height) / 64), 64), dtype=np.int)
 
     # we cannot just reverse keys and values as the values (BitArray) are
     # not hashable, and therefore not valid dictionary keys. Instead we will
@@ -284,7 +284,7 @@ def decode(inp, width, height, encoding_table):
     bid = 0
     i = 0
     while i < len(inp):
-        # let's decode the DC component using uint16
+        # let's decode the DC component using int16
         j = 0
         zigzag[bid][j] = inp[i:i+16].int
         i += 16
