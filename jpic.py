@@ -16,7 +16,7 @@ import utils
 
 FUNCTION_CHOICES = ['encode', 'decode', 'parse']
 QUANTIZATION_CHOICES = (['lossless',] +
-                        ['jpeg-%i' %i for i in range(20)] +
+                        ['jpeg-%i' %i for i in range(32)] +
                         ['uniform-%i' %i for i in range(32)])
 
 
