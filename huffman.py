@@ -134,15 +134,17 @@ def do_something(options):
     huffman_code = HuffmanCode(prob_distribution)
 
     # print huffman table
-    print(' Char | Huffman code ')
-    print('----------------------')
-    for symbol, encoding in huffman_code.table.items():
-        print(' %-4r |%12s' % (symbol, encoding))
+    print('input_string: "%s"\n' % string)
+    print(' Char | Probability | Huffman code ')
+    print('----------------------------------')
+    for ((symbol, encoding), prob) in zip(huffman_code.table.items(),
+                                          huffman_code.probability):
+        print(' %-4r | %0.9f |%12s' % (symbol, prob, encoding))
 
     length_of_code = [len(k) for k in huffman_code.table.values()]
     average_bits_per_symbol = sum(
         [a * b for a, b in zip(length_of_code, huffman_code.probability)])
-    print('average_bits_per_symbol: %f' % average_bits_per_symbol)
+    print('\naverage_bits_per_symbol: %f' % average_bits_per_symbol)
     # print("Efficiency of the code: %f" %
     # (length_of_code/average_bits_per_symbol))
 
