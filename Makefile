@@ -1,6 +1,7 @@
 
 
-all: img/src14_frame0.raw.png \
+all: \
+    src14_frame0.raw.png \
     lossless.csv \
     uniform.csv \
     jpicjpeg.csv \
@@ -74,13 +75,7 @@ decode.png: libjpeg.csv uniform.csv
         -i lossless.csv --label "jpic-lossless" --fmt 'r.-' \
         decode.png
 
-SRC_FILENAME=img/src14_frame0.raw
-SRC_FRAMENUM=0
-
 # raw
-img/src14_frame0.raw:
-	./jpic.py encode -Q lossless --dump-input img/src14_frame0.raw --frame ${SRC_FRAMENUM} ${SRC_FILENAME} img/src14_frame0.lossless.jpic
-
-img/src14_frame0.raw.png: img/src14_frame0.raw
+src14_frame0.raw.png: src14_frame0.raw
 	ffmpeg -y -f rawvideo -pixel_format yuv420p -s 720x480 -i $< $@
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SRC_FILENAME=img/src14_frame0.raw
+SRC_FILENAME=src14_frame0.raw
 
 # bash only: use for
 echo "#qp,encode,decode,size,psnr,ssim"
