@@ -6,7 +6,10 @@ all: img/src14_frame0.raw.png \
     jpicjpeg.csv \
     libjpeg.csv \
     size.png \
-    psnr.png
+    psnr.png \
+    ssim.png \
+    encode.png \
+    decode.png
 
 
 lossless.csv:
@@ -31,6 +34,15 @@ psnr.png: libjpeg.csv uniform.csv
         -i lossless.csv --label "jpic-lossless" --fmt 'k.-' \
         psnr.png
 
+ssim.png: libjpeg.csv uniform.csv
+	~/proj/plotty/plotty-plot.py -d --sep ',' --xcol qp --xlabel "QP value" \
+        --ycol ssim --ylabel "PSNR" --title "JPEG vs. JPIC Quality" \
+        -i libjpeg.csv --label "jpeg" --fmt 'r.-' \
+        -i uniform.csv --label "jpic-uniform" --fmt 'g.-' \
+        -i jpicjpeg.csv --label "jpic-jpeg" --fmt 'b.-' \
+        -i lossless.csv --label "jpic-lossless" --fmt 'k.-' \
+        ssim.png
+
 
 size.png: libjpeg.csv uniform.csv
 	~/proj/plotty/plotty-plot.py -d --sep ',' --xcol qp --xlabel "QP value" \
@@ -41,6 +53,24 @@ size.png: libjpeg.csv uniform.csv
         -i lossless.csv --label "jpic-lossless" --fmt 'k.-' \
         size.png
 
+
+encode.png: libjpeg.csv uniform.csv
+	~/proj/plotty/plotty-plot.py -d --sep ',' --xcol qp --xlabel "QP value" \
+        --ycol encode --ylabel "time (sec)" --title "JPEG vs. JPIC Encoding Time" \
+        -i libjpeg.csv --label "jpeg" --fmt 'r.-' \
+        -i uniform.csv --label "jpic-uniform" --fmt 'g.-' \
+        -i jpicjpeg.csv --label "jpic-jpeg" --fmt 'b.-' \
+        -i lossless.csv --label "jpic-lossless" --fmt 'k.-' \
+        encode.png
+
+decode.png: libjpeg.csv uniform.csv
+	~/proj/plotty/plotty-plot.py -d --sep ',' --xcol qp --xlabel "QP value" \
+        --ycol decode --ylabel "time (sec)" --title "JPEG vs. JPIC Encoding Time" \
+        -i libjpeg.csv --label "jpeg" --fmt 'r.-' \
+        -i uniform.csv --label "jpic-uniform" --fmt 'g.-' \
+        -i jpicjpeg.csv --label "jpic-jpeg" --fmt 'b.-' \
+        -i lossless.csv --label "jpic-lossless" --fmt 'k.-' \
+        decode.png
 
 SRC_FILENAME=~/tmp/vqeg/src14_ref__720x480_420.yuv
 SRC_FRAMENUM=0
