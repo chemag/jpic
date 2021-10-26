@@ -3,7 +3,7 @@
 """utils."""
 
 
-def read_as_bin(infile, size=-1, seek_pos=0):
+def read_as_raw(infile, size=-1, seek_pos=0):
     with open(infile, 'rb') as fin:
         if seek_pos > 0:
             fin.seek(seek_pos)
@@ -13,14 +13,8 @@ def read_as_bin(infile, size=-1, seek_pos=0):
     return data
 
 
-def write_as_bin(bstring, outfile):
-    # write binary string into outfile
-    with open(outfile, 'wb') as fout:
-        fout.write(bstring)
-
-
 def write_as_raw(buf, outfile):
-    # write buffer into the outfile
+    # write binary buffer into the outfile
     with open(outfile, 'wb') as fout:
         fout.write(buf)
 

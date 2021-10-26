@@ -148,7 +148,7 @@ def read_frame(infile, width, height, framenum=0):
     # assume 4:2:0 subsampling
     frame_size = int(width * height * 1.5)
     # read raw data from infile
-    frame_data = utils.read_as_bin(infile, frame_size, framenum * frame_size)
+    frame_data = utils.read_as_raw(infile, frame_size, framenum * frame_size)
     return frame_data
 
 

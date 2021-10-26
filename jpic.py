@@ -454,10 +454,10 @@ def main(argv):
             utils.write_as_raw(frame_data, options.dump_input)
         out = encode_file(frame_data, options.width, options.height,
                           options.quantization)
-        utils.write_as_bin(out, options.outfile)
+        utils.write_as_raw(out, options.outfile)
 
     elif options.function == 'decode':
-        bstring = utils.read_as_bin(options.infile)
+        bstring = utils.read_as_raw(options.infile)
         y, u, v = decode_file(bstring)
         if options.dump_pgm:
             utils.write_as_pgm(y, options.dump_pgm)
@@ -465,7 +465,7 @@ def main(argv):
         utils.write_as_raw(out, options.outfile)
 
     elif options.function == 'parse':
-        bstring = utils.read_as_bin(options.infile)
+        bstring = utils.read_as_raw(options.infile)
         info, size = parse_file(bstring)
         print(info)
         print(size)
