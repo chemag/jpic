@@ -84,7 +84,7 @@ Optional parameters:
 * `--frame <framenum>`: optional frame number. This allows using .yuv (raw YCbCr 4:2:0) video files as source files by letting you choose the frame number.
 * `-w <width>`: source file width (in pixels)
 * `-h <height>`: source file height (in pixels)
-* `-Q <quantization>`: quantization mechanism. Currently we support "lossless" (no quantization), "uniform-<val>" (uniform quantization, using a matrix with all the values set to "<val>"), and "jpeg-<val>" (matrix-based quantization, using a version of the JPEG matrices scaled down using "<val>").
+* `-Q <quantization>`: quantization mechanism. Currently we support "`lossless`" (no quantization), "`uniform-<val>`" (uniform quantization, using a matrix with all the values set to "`<val>`"), and "`jpeg-<val>`" (matrix-based quantization, using a version of the JPEG matrices scaled down using "`<val>`").
 
 Example:
 
@@ -224,7 +224,7 @@ The JPIC image format is a simple TLV (tag, length, value) format that allows si
 
 * tag: always 4 bytes
 * length: always 4 bytes. Value must be read in network order, and represents the length of the value *in bits* (which allows dumping generic bitstrings)
-* value: the value (length is <length> in bits). Tag dependent.
+* value: the value (length is `<length>` in bits). Tag dependent.
 
 File always starts with a 4-byte magic word ("jpic").
 
@@ -241,7 +241,7 @@ Some well-known tags:
 
 # Appendix 2: Coordinate Operation in Numpy
 
-Matrix shapes in numpy are always <height>x<width>.
+Matrix shapes in numpy are always `<height>x<width>`.
 
 Coordinates are always [i, j], where i is the height and j is the width,
 starting at the top-left part of the matrix, and moving down and right.
