@@ -109,18 +109,18 @@ def quantization_uniform_rev(m, val):
 
 
 def quantization_matrix(m, qm):
-    width, height = m.shape
-    for i in range(0, width, 8):
-        for j in range(0, height, 8):
+    height, width = m.shape
+    for i in range(0, height, 8):
+        for j in range(0, width, 8):
             # get block using numpy subset view
             m[i:i+8, j:j+8] = m[i:i+8, j:j+8] / qm
     return np.around(m).astype('int')
 
 
 def quantization_matrix_rev(m, qm):
-    width, height = m.shape
-    for i in range(0, width, 8):
-        for j in range(0, height, 8):
+    height, width = m.shape
+    for i in range(0, height, 8):
+        for j in range(0, width, 8):
             # get block using numpy subset view
             m[i:i+8, j:j+8] = m[i:i+8, j:j+8] * qm
     return np.around(m).astype('int')
@@ -152,13 +152,13 @@ def zigzag_block(block, order=ZIGZAG_ORDER):
 def zigzag_scan(inp):
     # convert a wxh matrix (where both w and h are multiples of 8) into
     # a 64x(w*h/64) matrix with the coefficients zig-zagged
-    width, height = inp.shape
+    height, width = inp.shape
     assert width % 8 == 0, 'width must be a multiple of 8 (%i)' % width
     assert height % 8 == 0, 'height must be a multiple of 8 (%i)' % height
     zigzag = np.zeros((int((width * height) / 64), 64), dtype=np.int16)
     bid = 0
-    for i in range(0, width, 8):
-        for j in range(0, height, 8):
+    for i in range(0, height, 8):
+        for j in range(0, width, 8):
             # get block using numpy subset view
             block = inp[i:i+8, j:j+8]
             zigzag[bid] = zigzag_block(block)
@@ -186,10 +186,10 @@ def zigzag_unscan(inp, width, height):
     assert height % 8 == 0, 'height must be a multiple of 8 (%i)' % height
     assert numblocks * sixtyfour == width * height
 
-    unzigzag = np.zeros((width, height), dtype=np.int16)
+    unzigzag = np.zeros((height, width), dtype=np.int16)
     bid = 0
-    for i in range(0, width, 8):
-        for j in range(0, height, 8):
+    for i in range(0, height, 8):
+        for j in range(0, width, 8):
             block = zigzag_unblock(inp[bid])
             # set block using numpy subset view
             unzigzag[i:i+8, j:j+8] = block
@@ -201,7 +201,7 @@ def zigzag_unscan(inp, width, height):
 def dc00_as_delta(inp):
     # basic approach: just get the delta from the previous value
     out = np.copy(inp)
-    numblocks = inp.shape[0]
+    numblocks, _ = inp.shape
     for i in range(1, numblocks):
         out[i][0] = inp[i][0] - inp[i - 1][0]
     dc000 = out[0][0]
@@ -212,7 +212,7 @@ def dc00_as_delta(inp):
 def get_symbol_distribution(inp):
     symbol_distribution = {'EOB': 0}
     # calculate all the symbols
-    numblocks = inp.shape[0]
+    numblocks, _ = inp.shape
     zerocnt = 0
     for i in range(0, numblocks):
         for j in range(1, 64):
@@ -251,7 +251,7 @@ def encode(inp, encoding_table):
     # create the output bitstring
     bits = bitstring.BitArray()
     # dc000, dinp = dc00_as_delta(inp)
-    numblocks = inp.shape[0]
+    numblocks, _ = inp.shape
     zerocnt = 0
     for i in range(0, numblocks):
         # let's encode the DC component using uint16

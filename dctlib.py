@@ -81,11 +81,11 @@ def get_block_idct(block):
 
 
 def get_frame_dct(inp):
-    width, height = inp.shape
-    dct = np.zeros((width, height))
+    height, width = inp.shape
+    dct = np.zeros((height, width))
     # break luma in 8x8 blocks
-    for i in range(0, width, 8):
-        for j in range(0, height, 8):
+    for i in range(0, height, 8):
+        for j in range(0, width, 8):
             # get block using numpy subset view
             # https://stackoverflow.com/questions/30917753/
             block = inp[i:i+8, j:j+8]
@@ -95,11 +95,11 @@ def get_frame_dct(inp):
 
 
 def get_frame_idct(inp):
-    width, height = inp.shape
-    idct = np.zeros((width, height))
+    height, width = inp.shape
+    idct = np.zeros((height, width))
     # break luma in 8x8 blocks
-    for i in range(0, width, 8):
-        for j in range(0, height, 8):
+    for i in range(0, height, 8):
+        for j in range(0, width, 8):
             # get block using numpy subset view
             # https://stackoverflow.com/questions/30917753/
             block = inp[i:i+8, j:j+8]
@@ -160,16 +160,16 @@ def parse_420_buffer(frame_data, width, height):
     height_c = height_y >> 1
     # read luma and chromas
     y = np.frombuffer(frame_data[:(width_y * height_y)], dtype=np.uint8)
-    y.shape = (width_y, height_y)
+    y.shape = (height_y, width_y)
     y = y.astype('float64')
     u = np.frombuffer(frame_data[(width_y * height_y):
                                  int(width_y * height_y * 1.25)],
                       dtype=np.uint8)
-    u.shape = (width_c, height_c)
+    u.shape = (height_c, width_c)
     u = u.astype('float64')
     v = np.frombuffer(frame_data[int(width_y * height_y * 1.25):],
                       dtype=np.uint8)
-    v.shape = (width_c, height_c)
+    v.shape = (height_c, width_c)
     v = v.astype('float64')
     return y, u, v
 
@@ -205,16 +205,7 @@ def process_file(options):
     idct_y = np.around(idct_y).astype('int')
 
     # recover frame into the outfile (as pgm format)
-    with open(options.outfile, 'w') as fout:
-        width, height = idct_y.shape
-        # print pgm header
-        fout.write('P2\n%i %i\n255\n' % idct_y.shape)
-        # print pgm contents
-        for i in range(0, width):
-            for j in range(0, height):
-                fout.write('%i ' % idct_y[i, j])
-            fout.write('\n')
-        fout.write('\n')
+    utils.write_as_pgm(idct_y, options.outfile)
 
 
 def get_options(argv):

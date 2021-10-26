@@ -28,12 +28,12 @@ def write_as_raw(buf, outfile):
 def write_as_pgm(array, outfile):
     # write frame into the outfile (as pgm format)
     with open(outfile, 'w') as fout:
-        width, height = array.shape
+        height, width = array.shape
         # print pgm header
-        fout.write('P2\n%i %i\n255\n' % array.shape)
+        fout.write('P2\n%i %i\n255\n' % (width, height))
         # print pgm contents
-        for i in range(0, width):
-            for j in range(0, height):
+        for i in range(0, height):
+            for j in range(0, width):
                 fout.write('%i ' % array[i, j])
             fout.write('\n')
         fout.write('\n')
