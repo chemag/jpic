@@ -22,7 +22,7 @@ $ git clone https://github.com/chemag/jpic
 $ cd jpic
 $ ./jpic.py --help
 usage: jpic.py [-h] [-d] [--quiet] [--width WIDTH] [--height HEIGHT]
-               [--video_size VIDEO_SIZE] [--framenum FRAMENUM]
+               [--video-size VIDEO_SIZE] [--framenum FRAMENUM]
                [-Q quantization] [-E] [-D] [-P] [--dump-input dump_input]
                [--dump-pgm dump_pgm]
                function input-file [output-file]
@@ -40,7 +40,7 @@ optional arguments:
   --quiet               Zero verbosity
   --width WIDTH         use WIDTH width (default: 720)
   --height HEIGHT       HEIGHT height (default: 480)
-  --video_size VIDEO_SIZE
+  --video-size VIDEO_SIZE
                         use <width>x<height>
   --framenum FRAMENUM   FRAMENUM (default: 0)
   -Q quantization, --quantization quantization
